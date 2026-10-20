@@ -1,283 +1,94 @@
-:root {
-  --bg-0: #0d1117;
-  --bg-1: #111827;
-  --bg-2: #1f2937;
-  --bg-3: #2d3748;
-  --surface: #161b22;
-  --surface-2: #1f2937;
-  --surface-3: #0f172a;
-  --border: rgba(148, 163, 184, 0.22);
-  --text: #e5e7eb;
-  --muted: #9ca3af;
-  --accent: #6ee7b7;
-  --accent-2: #60a5fa;
-  --warning: #fbbf24;
-  --danger: #f87171;
-  --shadow: rgba(15, 23, 42, 0.42);
-  --radius: 14px;
-}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WScode — CodePen-style Editor</title>
+    <meta
+      name="description"
+      content="A static CodePen-inspired HTML, CSS, and JavaScript playground for GitHub Pages."
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="toolbar-bar">
+        <div class="header-left">
+          <div class="brand">
+            <div class="brand-mark">WS</div>
+            <div class="brand-text">
+              <strong>WScode</strong>
+              <span>HTML / CSS / JS</span>
+            </div>
+          </div>
+        </div>
 
-* {
-  box-sizing: border-box;
-}
+        <div class="header-center">
+          <div class="project-input-wrap">
+            <span class="project-pill">Project</span>
+            <input id="projectName" type="text" value="WScode Playground" aria-label="Project name" />
+          </div>
+        </div>
 
-html, body {
-  margin: 0;
-  height: 100%;
-  background: linear-gradient(135deg, var(--bg-0), var(--bg-1));
-  color: var(--text);
-  font-family: Inter, "Segoe UI", sans-serif;
-}
+        <div class="header-right">
+          <button class="action-btn subtle" id="saveBtn" type="button">Save</button>
+          <button class="action-btn subtle" id="resetBtn" type="button">Reset</button>
+          <button class="action-btn primary" id="runBtn" type="button">Run</button>
+          <button class="action-btn" id="importBtn" type="button">Import</button>
+          <button class="action-btn" id="exportBtn" type="button">Export</button>
+          <input id="fileInput" type="file" accept=".html,.css,.js,.json,application/json" hidden />
+        </div>
+      </header>
 
-body {
-  min-height: 100vh;
-}
+      <main class="editor-layout" id="editorLayout">
+        <section class="code-panel">
+          <div class="panel-top">
+            <div class="tab-list" role="tablist" aria-label="Editor tabs">
+              <button class="tab active" data-tab="html" role="tab" aria-selected="true">HTML</button>
+              <button class="tab" data-tab="css" role="tab" aria-selected="false">CSS</button>
+              <button class="tab" data-tab="js" role="tab" aria-selected="false">JS</button>
+            </div>
 
-button, textarea {
-  font: inherit;
-}
+            <div class="tab-tools">
+              <button class="small-btn" id="downloadHtmlBtn" type="button">HTML</button>
+              <button class="small-btn" id="downloadCssBtn" type="button">CSS</button>
+              <button class="small-btn" id="downloadJsBtn" type="button">JS</button>
+            </div>
+          </div>
 
-button {
-  cursor: pointer;
-}
+          <div class="editor-stack">
+            <div class="editor-wrap active" data-editor="html">
+              <div class="editor-label">index.html</div>
+              <textarea id="htmlEditor" spellcheck="false" aria-label="HTML editor"></textarea>
+            </div>
 
-.app-shell {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
+            <div class="editor-wrap" data-editor="css">
+              <div class="editor-label">style.css</div>
+              <textarea id="cssEditor" spellcheck="false" aria-label="CSS editor"></textarea>
+            </div>
 
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  height: 68px;
-  padding: 12px 18px;
-  background: rgba(17, 24, 39, 0.92);
-  border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(12px);
-}
+            <div class="editor-wrap" data-editor="js">
+              <div class="editor-label">script.js</div>
+              <textarea id="jsEditor" spellcheck="false" aria-label="JavaScript editor"></textarea>
+            </div>
+          </div>
+        </section>
 
-.brand-wrap {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+        <div class="splitter" id="splitter" aria-label="Resize preview panel" title="Drag to resize"></div>
 
-.logo {
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #04131b;
-  font-weight: 800;
-  box-shadow: 0 10px 20px rgba(96, 165, 250, 0.32);
-}
+        <aside class="preview-panel">
+          <div class="preview-topbar">
+            <span>Result</span>
+            <div class="status-wrap">
+              <span class="live-indicator" id="liveIndicator">●</span>
+              <span class="status-text">Live</span>
+            </div>
+          </div>
+          <iframe id="previewFrame" title="Live preview"></iframe>
+        </aside>
+      </main>
+    </div>
 
-.brand-meta {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.15;
-}
-
-.brand-name {
-  font-size: 1.08rem;
-  font-weight: 700;
-}
-
-.brand-sub {
-  font-size: 0.7rem;
-  color: var(--muted);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.tool-btn,
-.mini-btn,
-.tab {
-  border: 1px solid var(--border);
-  background: rgba(148, 163, 184, 0.08);
-  color: var(--text);
-  border-radius: 10px;
-  transition: 160ms ease;
-}
-
-.tool-btn {
-  padding: 10px 14px;
-  font-weight: 600;
-}
-
-.tool-btn.primary {
-  background: linear-gradient(135deg, var(--accent), #8b5cf6);
-  border-color: transparent;
-  color: #06212a;
-}
-
-.tool-btn:hover,
-.mini-btn:hover,
-.tab:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.22);
-}
-
-.workspace {
-  flex: 1;
-  display: grid;
-  grid-template-columns: minmax(420px, 1.15fr) minmax(320px, 0.85fr);
-  min-height: 0;
-}
-
-.editor-panel,
-.preview-panel {
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.editor-panel {
-  border-right: 1px solid var(--border);
-}
-
-.panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
-  background: rgba(15, 23, 42, 0.78);
-  border-bottom: 1px solid var(--border);
-  min-height: 56px;
-}
-
-.tab-group {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.tab {
-  padding: 8px 12px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.tab.active {
-  background: rgba(110, 231, 183, 0.12);
-  border-color: rgba(110, 231, 183, 0.45);
-  color: var(--accent);
-}
-
-.panel-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.mini-btn {
-  padding: 7px 10px;
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.preview-header {
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-
-.status-dot {
-  color: var(--accent);
-  filter: drop-shadow(0 0 8px rgba(110, 231, 183, 0.7));
-}
-
-.editor-stack {
-  position: relative;
-  flex: 1;
-  min-height: 0;
-  background: var(--surface);
-}
-
-.editor {
-  display: none;
-  width: 100%;
-  height: 100%;
-}
-
-.editor.active {
-  display: block;
-}
-
-textarea {
-  width: 100%;
-  height: 100%;
-  border: 0;
-  padding: 18px 18px 24px;
-  resize: none;
-  background: #0d1117;
-  color: #e2e8f0;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-  font-size: 14px;
-  line-height: 1.55;
-  tab-size: 2;
-  outline: none;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
-}
-
-textarea::selection {
-  background: rgba(96, 165, 250, 0.32);
-}
-
-.preview-panel {
-  background: rgba(17, 24, 39, 0.7);
-}
-
-#previewFrame {
-  width: 100%;
-  height: 100%;
-  border: 0;
-  background: white;
-}
-
-@media (max-width: 980px) {
-  .workspace {
-    grid-template-columns: 1fr;
-    grid-template-rows: minmax(380px, 1fr) minmax(280px, 0.9fr);
-  }
-
-  .editor-panel {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-}
-
-@media (max-width: 640px) {
-  .topbar {
-    align-items: flex-start;
-    flex-direction: column;
-    height: auto;
-  }
-
-  .toolbar {
-    width: 100%;
-  }
-
-  .tool-btn {
-    flex: 1 1 auto;
-  }
-
-  .panel-header {
-    flex-wrap: wrap;
-  }
-}
+    <script src="script.js"></script>
+  </body>
+</html>
