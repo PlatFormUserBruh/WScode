@@ -5,6 +5,7 @@
   --panel: #141c24;
   --panel-2: #1b2430;
   --panel-3: #202b38;
+  --sidebar: #0f151c;
   --toolbar: #131a22;
   --border: rgba(255, 255, 255, 0.08);
   --border-strong: rgba(255, 255, 255, 0.14);
@@ -43,11 +44,159 @@ button {
 }
 
 .app-shell {
-  height: 100vh;
   display: flex;
-  flex-direction: column;
+  width: 100%;
+  height: 100vh;
   overflow: hidden;
   background: linear-gradient(180deg, #0e141a 0%, #141b24 100%);
+}
+
+.sidebar {
+  width: 260px;
+  background: linear-gradient(180deg, #0d141a 0%, var(--sidebar) 100%);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  transition: transform 180ms ease, width 180ms ease;
+  z-index: 10;
+}
+
+.sidebar.collapsed {
+  width: 0;
+  transform: translateX(-100%);
+  border-right: none;
+}
+
+.sidebar-header,
+.sidebar-actions {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 52px;
+}
+
+.sidebar-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-title {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.sidebar-toggle,
+.floating-sidebar-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+  color: var(--text);
+}
+
+.sidebar-actions {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.sidebar-add {
+  width: 100%;
+  min-height: 36px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.03);
+  color: var(--text);
+  font-weight: 700;
+}
+
+.file-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 10px 16px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  background: rgba(255,255,255,0.015);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--text-soft);
+  text-align: left;
+}
+
+.file-item.active {
+  background: rgba(255, 221, 87, 0.08);
+  border-color: rgba(255, 221, 87, 0.3);
+}
+
+.file-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.file-type {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.04);
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.82rem;
+}
+
+.file-actions-mini {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.file-action-btn {
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+  color: var(--text-soft);
+  border-radius: 7px;
+  min-width: 28px;
+  min-height: 28px;
+  padding: 0 7px;
+  font-size: 0.72rem;
+}
+
+.main-shell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .toolbar-bar {
@@ -71,6 +220,7 @@ button {
 
 .header-left {
   flex: 0 0 auto;
+  gap: 10px;
 }
 
 .header-center {
@@ -185,7 +335,11 @@ button {
 
 .action-btn:hover,
 .small-btn:hover,
-.tab:hover {
+.tab:hover,
+.sidebar-toggle:hover,
+.floating-sidebar-btn:hover,
+.sidebar-add:hover,
+.file-action-btn:hover {
   transform: translateY(-1px);
   border-color: var(--border-strong);
   box-shadow: 0 8px 18px rgba(0,0,0,0.18);
