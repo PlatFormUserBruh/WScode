@@ -1,557 +1,334 @@
-:root {
-  --bg: #151a21;
-  --bg-2: #1d2430;
-  --bg-3: #111821;
-  --panel: #141c24;
-  --panel-2: #1b2430;
-  --panel-3: #202b38;
-  --sidebar: #0f151c;
-  --toolbar: #131a22;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.14);
-  --muted: #8a93a6;
-  --text: #ebf1ff;
-  --text-soft: #c9d2e4;
-  --accent: #ffdd57;
-  --accent-2: #6bdcff;
-  --accent-3: #7dff9f;
-  --danger: #ff6b6b;
-  --shadow: rgba(0, 0, 0, 0.32);
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html, body {
+const defaultProject = {
+  projectName: 'WScode Playground',
+  html: `<!DOCTYPE html>
+<html>
+  <body>
+    <div class="card">
+      <h1>Hello, WScode 👋</h1>
+      <p>Build anything here and watch it update instantly.</p>
+      <button id="demoBtn">Click me</button>
+    </div>
+  </body>
+</html>`,
+  css: `body {
   margin: 0;
-  height: 100%;
-  background: var(--bg);
-  color: var(--text);
-  font-family: Inter, "Segoe UI", Roboto, sans-serif;
-}
-
-body {
   min-height: 100vh;
+  font-family: Arial, sans-serif;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #0f172a, #1d4ed8);
+  color: #e2e8f0;
 }
 
-button, input, textarea {
-  font: inherit;
+.card {
+  width: min(420px, 80vw);
+  padding: 32px;
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.45);
+  text-align: center;
+}
+
+h1 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+}
+
+p {
+  font-size: 1rem;
+  color: #cbd5e1;
+  margin-bottom: 20px;
 }
 
 button {
-  cursor: pointer;
-}
-
-.app-shell {
-  display: flex;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
-  background: linear-gradient(180deg, #0e141a 0%, #141b24 100%);
-}
-
-.sidebar {
-  width: 260px;
-  background: linear-gradient(180deg, #0d141a 0%, var(--sidebar) 100%);
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  transition: transform 180ms ease, width 180ms ease;
-  z-index: 10;
-}
-
-.sidebar.collapsed {
-  width: 0;
-  transform: translateX(-100%);
-  border-right: none;
-}
-
-.sidebar-header,
-.sidebar-actions {
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--border);
-}
-
-.sidebar-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 52px;
-}
-
-.sidebar-title-wrap {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.sidebar-title {
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.sidebar-toggle,
-.floating-sidebar-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,0.02);
-  color: var(--text);
-}
-
-.sidebar-actions {
-  padding-top: 12px;
-  padding-bottom: 12px;
-}
-
-.sidebar-add {
-  width: 100%;
-  min-height: 36px;
-  border: 1px solid var(--border-strong);
-  border-radius: 10px;
-  background: rgba(255,255,255,0.03);
-  color: var(--text);
-  font-weight: 700;
-}
-
-.file-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px 10px 16px;
-}
-
-.file-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  width: 100%;
-  min-height: 42px;
-  padding: 8px 10px;
-  margin-bottom: 8px;
-  background: rgba(255,255,255,0.015);
-  border: 1px solid transparent;
-  border-radius: 10px;
-  color: var(--text-soft);
-  text-align: left;
-}
-
-.file-item.active {
-  background: rgba(255, 221, 87, 0.08);
-  border-color: rgba(255, 221, 87, 0.3);
-}
-
-.file-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.file-type {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 32px;
-  padding: 4px 6px;
-  border-radius: 6px;
-  background: rgba(255,255,255,0.04);
-  color: var(--muted);
-  font-size: 0.62rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.file-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 0.82rem;
-}
-
-.file-actions-mini {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.file-action-btn {
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,0.02);
-  color: var(--text-soft);
-  border-radius: 7px;
-  min-width: 28px;
-  min-height: 28px;
-  padding: 0 7px;
-  font-size: 0.72rem;
-}
-
-.main-shell {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.toolbar-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  min-height: 62px;
-  padding: 10px 14px;
-  background: rgba(19, 24, 31, 0.96);
-  border-bottom: 1px solid var(--border);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.02);
-}
-
-.header-left,
-.header-center,
-.header-right {
-  display: flex;
-  align-items: center;
-}
-
-.header-left {
-  flex: 0 0 auto;
-  gap: 10px;
-}
-
-.header-center {
-  flex: 1;
-  justify-content: center;
-  min-width: 0;
-}
-
-.header-right {
-  justify-content: flex-end;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding-right: 10px;
-}
-
-.brand-mark {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, #ffdd57, #6bdcff);
-  color: #111;
-  font-weight: 900;
-  font-size: 0.82rem;
-  box-shadow: 0 10px 20px rgba(107, 220, 255, 0.24);
-}
-
-.brand-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.1;
-}
-
-.brand-text strong {
-  font-size: 1rem;
-  letter-spacing: 0.02em;
-}
-
-.brand-text span {
-  font-size: 0.68rem;
-  color: var(--muted);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.project-input-wrap {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 7px 10px;
-  min-width: min(400px, 45vw);
-}
-
-.project-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 3px 8px;
-  border-radius: 7px;
-  font-size: 0.64rem;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  background: rgba(255,255,255,0.04);
-  color: var(--muted);
-}
-
-.project-input-wrap input {
-  width: 100%;
-  border: none;
-  background: transparent;
-  color: var(--text);
-  font-size: 0.86rem;
-  outline: none;
-}
-
-.action-btn,
-.small-btn,
-.tab {
-  border: 1px solid var(--border);
-  background: rgba(255,255,255,0.02);
-  color: var(--text);
-  border-radius: 8px;
-  transition: 160ms ease;
-}
-
-.action-btn {
-  min-height: 36px;
-  padding: 0 14px;
-  font-weight: 600;
-}
-
-.action-btn.primary {
-  background: linear-gradient(135deg, #ffd857, #f5c542);
-  border-color: transparent;
-  color: #1b1b1b;
-  box-shadow: 0 12px 24px rgba(255, 216, 87, 0.18);
-}
-
-.action-btn.subtle {
-  background: rgba(255,255,255,0.03);
-}
-
-.action-btn:hover,
-.small-btn:hover,
-.tab:hover,
-.sidebar-toggle:hover,
-.floating-sidebar-btn:hover,
-.sidebar-add:hover,
-.file-action-btn:hover {
-  transform: translateY(-1px);
-  border-color: var(--border-strong);
-  box-shadow: 0 8px 18px rgba(0,0,0,0.18);
-}
-
-.editor-layout {
-  flex: 1;
-  min-height: 0;
-  display: grid;
-  grid-template-columns: minmax(420px, 1.2fr) 12px minmax(300px, 0.8fr);
-  overflow: hidden;
-}
-
-.code-panel,
-.preview-panel {
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  background: var(--panel);
-}
-
-.panel-top,
-.preview-topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-height: 52px;
-  padding: 8px 14px;
-  background: rgba(21, 26, 33, 0.98);
-  border-bottom: 1px solid var(--border);
-}
-
-.tab-list {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.tab {
-  padding: 8px 12px;
-  min-height: 32px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.tab.active {
-  background: rgba(255, 221, 87, 0.1);
-  border-color: rgba(255, 221, 87, 0.42);
-  color: #ffd857;
-}
-
-.tab-tools {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.small-btn {
-  min-height: 30px;
-  padding: 0 10px;
-  font-size: 0.7rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.editor-stack {
-  flex: 1;
-  min-height: 0;
-  background: var(--bg-3);
-}
-
-.editor-wrap {
-  display: none;
-  height: 100%;
-  flex-direction: column;
-}
-
-.editor-wrap.active {
-  display: flex;
-}
-
-.editor-label {
-  display: flex;
-  align-items: center;
-  padding: 8px 14px 6px;
-  font-size: 0.72rem;
-  color: var(--muted);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  background: rgba(255,255,255,0.015);
-  border-bottom: 1px solid var(--border);
-}
-
-textarea {
-  width: 100%;
-  flex: 1;
-  resize: none;
-  border: none;
-  outline: none;
-  padding: 16px 14px 18px;
-  background: #10171d;
-  color: #edf3ff;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-  font-size: 14px;
-  line-height: 1.6;
-  tab-size: 2;
-}
-
-textarea::selection {
-  background: rgba(107, 220, 255, 0.35);
-}
-
-.splitter {
-  position: relative;
-  background: rgba(255,255,255,0.04);
-  border-left: 1px solid var(--border);
-  border-right: 1px solid var(--border);
-  cursor: col-resize;
-}
-
-.splitter::before {
-  content: "";
-  position: absolute;
-  inset: 50% 4px auto 4px;
-  transform: translateY(-50%);
-  height: 48px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.09);
-}
-
-.preview-panel {
-  background: #f3f5f9;
-}
-
-.preview-topbar {
-  background: rgba(18, 23, 29, 0.96);
-  color: var(--text);
-}
-
-.status-wrap {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.live-indicator {
-  color: var(--accent-3);
-  font-size: 0.8rem;
-  text-shadow: 0 0 10px rgba(125, 255, 159, 0.8);
-}
-
-.status-text {
-  font-size: 0.76rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-}
-
-#previewFrame {
-  width: 100%;
-  height: 100%;
+  background: linear-gradient(135deg, #6ee7b7, #60a5fa);
+  color: #04131b;
   border: 0;
-  background: white;
-}
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}`,
+  js: `document.getElementById('demoBtn')?.addEventListener('click', () => {
+  alert('WScode preview is live!');
+});`
+};
 
-@media (max-width: 980px) {
-  .toolbar-bar {
-    flex-wrap: wrap;
-    padding-top: 12px;
-    padding-bottom: 12px;
-  }
+const STORAGE_KEY = 'wscode-project-v1';
+const htmlEditor = document.getElementById('htmlEditor');
+const cssEditor = document.getElementById('cssEditor');
+const jsEditor = document.getElementById('jsEditor');
+const previewFrame = document.getElementById('previewFrame');
+const fileInput = document.getElementById('fileInput');
+const liveIndicator = document.getElementById('liveIndicator');
+const projectNameInput = document.getElementById('projectName');
+const sidebar = document.getElementById('sidebar');
+const fileList = document.getElementById('fileList');
+const tabs = document.querySelectorAll('.tab');
+const editors = document.querySelectorAll('.editor-wrap');
 
-  .header-center {
-    order: 3;
-    width: 100%;
-  }
+const state = loadProject();
+let activeType = 'html';
 
-  .project-input-wrap {
-    width: 100%;
-    min-width: 0;
-  }
+const fileModel = [
+  { id: 'html', label: 'index.html', type: 'HTML' },
+  { id: 'css', label: 'style.css', type: 'CSS' },
+  { id: 'js', label: 'script.js', type: 'JS' }
+];
 
-  .editor-layout {
-    grid-template-columns: 1fr;
-    grid-template-rows: minmax(420px, 1fr) 12px minmax(300px, 0.8fr);
-  }
+function loadProject() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (!saved) return JSON.parse(JSON.stringify(defaultProject));
 
-  .splitter {
-    display: none;
-  }
-}
-
-@media (max-width: 640px) {
-  .header-right {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .action-btn {
-    flex: 1 1 calc(50% - 10px);
-  }
-
-  .panel-top {
-    flex-wrap: wrap;
-  }
-
-  .tab-list,
-  .tab-tools {
-    width: 100%;
-    justify-content: space-between;
+  try {
+    const parsed = JSON.parse(saved);
+    return {
+      projectName: parsed.projectName || defaultProject.projectName,
+      html: parsed.html ?? defaultProject.html,
+      css: parsed.css ?? defaultProject.css,
+      js: parsed.js ?? defaultProject.js
+    };
+  } catch (error) {
+    return JSON.parse(JSON.stringify(defaultProject));
   }
 }
+
+function saveProject() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function syncEditorsFromState() {
+  htmlEditor.value = state.html;
+  cssEditor.value = state.css;
+  jsEditor.value = state.js;
+  projectNameInput.value = state.projectName;
+  renderPreview();
+}
+
+function setActiveTab(type) {
+  activeType = type;
+
+  tabs.forEach((tab) => {
+    const isActive = tab.dataset.tab === type;
+    tab.classList.toggle('active', isActive);
+    tab.setAttribute('aria-selected', String(isActive));
+  });
+
+  editors.forEach((editor) => {
+    const isActive = editor.dataset.editor === type;
+    editor.classList.toggle('active', isActive);
+  });
+}
+
+function renderPreview() {
+  state.html = htmlEditor.value;
+  state.css = cssEditor.value;
+  state.js = jsEditor.value;
+  state.projectName = projectNameInput.value.trim() || defaultProject.projectName;
+  saveProject();
+
+  const doc = `<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>${state.css}</style>
+  </head>
+  <body>
+    ${state.html}
+    <script>
+      try {
+        ${state.js}
+      } catch (error) {
+        const err = document.createElement('pre');
+        err.style.cssText = 'margin:16px;padding:12px;border-radius:8px;background:#fee2e2;color:#991b1b;font-family:monospace;white-space:pre-wrap;';
+        err.textContent = 'JavaScript error: ' + error.message;
+        document.body.appendChild(err);
+      }
+    <\/script>
+  </body>
+</html>`;
+
+  previewFrame.srcdoc = doc;
+  liveIndicator.style.color = '#7dff9f';
+}
+
+function buildDownload(filename, content, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportProject() {
+  const payload = JSON.stringify({ projectName: state.projectName, html: state.html, css: state.css, js: state.js }, null, 2);
+  buildDownload('wscode-project.json', payload, 'application/json');
+}
+
+function exportSingle(type) {
+  const map = {
+    html: { file: 'index.html', content: state.html },
+    css: { file: 'style.css', content: state.css },
+    js: { file: 'script.js', content: state.js }
+  };
+  const item = map[type];
+  if (!item) return;
+  buildDownload(item.file, item.content, 'text/plain;charset=utf-8');
+}
+
+async function importProject(event) {
+  const [file] = event.target.files || [];
+  if (!file) return;
+
+  const text = await file.text();
+  try {
+    const payload = JSON.parse(text);
+    if (payload.html !== undefined || payload.css !== undefined || payload.js !== undefined) {
+      state.projectName = payload.projectName || state.projectName;
+      state.html = payload.html ?? state.html;
+      state.css = payload.css ?? state.css;
+      state.js = payload.js ?? state.js;
+      syncEditorsFromState();
+      fileInput.value = '';
+      return;
+    }
+  } catch (error) {
+    // ignore and fall through to single-file handling
+  }
+
+  if (file.name.endsWith('.html')) state.html = text;
+  else if (file.name.endsWith('.css')) state.css = text;
+  else if (file.name.endsWith('.js')) state.js = text;
+
+  syncEditorsFromState();
+  fileInput.value = '';
+}
+
+function renderFileList() {
+  fileList.innerHTML = fileModel
+    .map((file) => {
+      const activeClass = activeType === file.id ? 'active' : '';
+      return `
+        <div class="file-item ${activeClass}" data-file-type="${file.id}">
+          <div class="file-meta">
+            <span class="file-type">${file.type}</span>
+            <span class="file-name">${file.label}</span>
+          </div>
+          <div class="file-actions-mini">
+            <button class="file-action-btn" data-action="rename" data-target="${file.id}" type="button">✎</button>
+            <button class="file-action-btn" data-action="delete" data-target="${file.id}" type="button">×</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+}
+
+function renameFile(type) {
+  const current = {
+    html: 'index.html',
+    css: 'style.css',
+    js: 'script.js'
+  };
+
+  const nextName = window.prompt('Rename file:', current[type] || 'file.txt');
+  if (!nextName) return;
+
+  const trimmed = nextName.trim();
+  if (!trimmed) return;
+
+  const match = fileModel.find((item) => item.id === type);
+  if (!match) return;
+
+  match.label = trimmed.includes('.') ? trimmed : `${trimmed}.${type}`;
+  renderFileList();
+}
+
+function addFile() {
+  const nextIndex = fileModel.length + 1;
+  const type = fileModel.length % 3 === 0 ? 'html' : fileModel.length % 3 === 1 ? 'css' : 'js';
+  const label = `custom-${nextIndex}.${type}`;
+  fileModel.push({ id: `custom-${nextIndex}`, label, type: type.toUpperCase() });
+  renderFileList();
+}
+
+function deleteFile(type) {
+  if (type === 'html') state.html = defaultProject.html;
+  if (type === 'css') state.css = defaultProject.css;
+  if (type === 'js') state.js = defaultProject.js;
+  syncEditorsFromState();
+}
+
+function toggleSidebar(forceState) {
+  const shouldOpen = typeof forceState === 'boolean' ? forceState : sidebar.classList.contains('collapsed');
+  sidebar.classList.toggle('collapsed', !shouldOpen);
+}
+
+htmlEditor.addEventListener('input', renderPreview);
+cssEditor.addEventListener('input', renderPreview);
+jsEditor.addEventListener('input', renderPreview);
+projectNameInput.addEventListener('input', renderPreview);
+
+document.getElementById('saveBtn').addEventListener('click', renderPreview);
+document.getElementById('resetBtn').addEventListener('click', () => {
+  const fresh = JSON.parse(JSON.stringify(defaultProject));
+  state.projectName = fresh.projectName;
+  state.html = fresh.html;
+  state.css = fresh.css;
+  state.js = fresh.js;
+  syncEditorsFromState();
+});
+document.getElementById('runBtn').addEventListener('click', renderPreview);
+document.getElementById('importBtn').addEventListener('click', () => fileInput.click());
+document.getElementById('exportBtn').addEventListener('click', exportProject);
+document.getElementById('downloadHtmlBtn').addEventListener('click', () => exportSingle('html'));
+document.getElementById('downloadCssBtn').addEventListener('click', () => exportSingle('css'));
+document.getElementById('downloadJsBtn').addEventListener('click', () => exportSingle('js'));
+fileInput.addEventListener('change', importProject);
+document.getElementById('newFileBtn').addEventListener('click', addFile);
+document.getElementById('sidebarToggle').addEventListener('click', () => toggleSidebar());
+document.getElementById('openSidebarBtn').addEventListener('click', () => toggleSidebar(true));
+
+tabs.forEach((tab) => {
+  tab.addEventListener('click', () => setActiveTab(tab.dataset.tab));
+});
+
+fileList.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-action]');
+  if (!button) {
+    const item = event.target.closest('.file-item');
+    if (item) setActiveTab(item.dataset.fileType);
+    return;
+  }
+
+  const target = button.dataset.target;
+  if (button.dataset.action === 'rename') renameFile(target);
+  if (button.dataset.action === 'delete') deleteFile(target);
+});
+
+const splitter = document.getElementById('splitter');
+const editorLayout = document.getElementById('editorLayout');
+let isDragging = false;
+
+splitter.addEventListener('mousedown', () => {
+  isDragging = true;
+});
+
+document.addEventListener('mousemove', (event) => {
+  if (!isDragging) return;
+  const containerWidth = editorLayout.clientWidth;
+  const leftWidth = Math.min(Math.max(event.clientX - editorLayout.getBoundingClientRect().left, 300), containerWidth - 300);
+  editorLayout.style.gridTemplateColumns = `${leftWidth}px 12px ${containerWidth - leftWidth - 12}px`;
+});
+
+document.addEventListener('mouseup', () => {
+  isDragging = false;
+});
+
+syncEditorsFromState();
+setActiveTab('html');
+renderFileList();
