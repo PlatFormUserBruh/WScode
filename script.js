@@ -71,12 +71,15 @@ const editors = document.querySelectorAll('.editor-wrap');
 
 const state = loadProject();
 let activeType = 'html';
+let activeFileId = 'html';
 
-const fileModel = [
-  { id: 'html', label: 'index.html', type: 'HTML' },
-  { id: 'css', label: 'style.css', type: 'CSS' },
-  { id: 'js', label: 'script.js', type: 'JS' }
+const BASE_FILES = [
+  { id: 'html', label: 'index.html', type: 'HTML', kind: 'html' },
+  { id: 'css', label: 'style.css', type: 'CSS', kind: 'css' },
+  { id: 'js', label: 'script.js', type: 'JS', kind: 'js' }
 ];
+
+let fileModel = [...BASE_FILES];
 
 function loadProject() {
   const saved = localStorage.getItem(STORAGE_KEY);
@@ -120,6 +123,14 @@ function setActiveTab(type) {
     const isActive = editor.dataset.editor === type;
     editor.classList.toggle('active', isActive);
   });
+}
+
+function focusFile(fileId) {
+  const item = fileModel.find((entry) => entry.id === fileId);
+  if (!item) return;
+  activeFileId = fileId;
+  setActiveTab(item.kind);
+  renderFileList();
 }
 
 function renderPreview() {
@@ -212,9 +223,9 @@ async function importProject(event) {
 function renderFileList() {
   fileList.innerHTML = fileModel
     .map((file) => {
-      const activeClass = activeType === file.id ? 'active' : '';
+      const activeClass = activeFileId === file.id ? 'active' : '';
       return `
-        <div class="file-item ${activeClass}" data-file-type="${file.id}">
+        <div class="file-item ${activeClass}" data-file-id="${file.id}" data-file-type="${file.kind}">
           <div class="file-meta">
             <span class="file-type">${file.type}</span>
             <span class="file-name">${file.label}</span>
@@ -225,41 +236,56 @@ function renderFileList() {
           </div>
         </div>
       `;
-    }).join('');
+    })
+    .join('');
 }
 
-function renameFile(type) {
-  const current = {
-    html: 'index.html',
-    css: 'style.css',
-    js: 'script.js'
-  };
+function renameFile(fileId) {
+  const file = fileModel.find((entry) => entry.id === fileId);
+  if (!file) return;
 
-  const nextName = window.prompt('Rename file:', current[type] || 'file.txt');
+  const nextName = window.prompt('Rename file:', file.label);
   if (!nextName) return;
 
   const trimmed = nextName.trim();
   if (!trimmed) return;
 
-  const match = fileModel.find((item) => item.id === type);
-  if (!match) return;
-
-  match.label = trimmed.includes('.') ? trimmed : `${trimmed}.${type}`;
+  file.label = trimmed.includes('.') ? trimmed : `${trimmed}.${file.kind}`;
   renderFileList();
 }
 
 function addFile() {
-  const nextIndex = fileModel.length + 1;
-  const type = fileModel.length % 3 === 0 ? 'html' : fileModel.length % 3 === 1 ? 'css' : 'js';
-  const label = `custom-${nextIndex}.${type}`;
-  fileModel.push({ id: `custom-${nextIndex}`, label, type: type.toUpperCase() });
+  const kind = ['html', 'css', 'js'][fileModel.length % 3];
+  const id = `custom-${Date.now()}`;
+  const label = `custom-${fileModel.length + 1}.${kind}`;
+  fileModel.push({ id, label, type: kind.toUpperCase(), kind });
+  activeFileId = id;
+  setActiveTab(kind);
   renderFileList();
 }
 
-function deleteFile(type) {
-  if (type === 'html') state.html = defaultProject.html;
-  if (type === 'css') state.css = defaultProject.css;
-  if (type === 'js') state.js = defaultProject.js;
+function deleteFile(fileId) {
+  const file = fileModel.find((entry) => entry.id === fileId);
+  if (!file) return;
+
+  const isBase = BASE_FILES.some((entry) => entry.id === file.id);
+
+  if (isBase) {
+    if (file.kind === 'html') state.html = defaultProject.html;
+    if (file.kind === 'css') state.css = defaultProject.css;
+    if (file.kind === 'js') state.js = defaultProject.js;
+    syncEditorsFromState();
+    return;
+  }
+
+  fileModel = fileModel.filter((entry) => entry.id !== fileId);
+
+  if (activeFileId === fileId) {
+    activeFileId = fileModel[0]?.id || 'html';
+    setActiveTab(fileModel[0]?.kind || 'html');
+  }
+
+  renderFileList();
   syncEditorsFromState();
 }
 
@@ -294,20 +320,35 @@ document.getElementById('sidebarToggle').addEventListener('click', () => toggleS
 document.getElementById('openSidebarBtn').addEventListener('click', () => toggleSidebar(true));
 
 tabs.forEach((tab) => {
-  tab.addEventListener('click', () => setActiveTab(tab.dataset.tab));
+  tab.addEventListener('click', () => {
+    const kind = tab.dataset.tab;
+    activeType = kind;
+    const matchingFile = fileModel.find((entry) => entry.kind === kind) || fileModel[0];
+    if (matchingFile) activeFileId = matchingFile.id;
+    setActiveTab(kind);
+    renderFileList();
+  });
 });
 
 fileList.addEventListener('click', (event) => {
-  const button = event.target.closest('[data-action]');
-  if (!button) {
-    const item = event.target.closest('.file-item');
-    if (item) setActiveTab(item.dataset.fileType);
+  const actionButton = event.target.closest('[data-action]');
+  if (actionButton) {
+    const target = actionButton.dataset.target;
+    if (actionButton.dataset.action === 'rename') renameFile(target);
+    if (actionButton.dataset.action === 'delete') deleteFile(target);
     return;
   }
 
-  const target = button.dataset.target;
-  if (button.dataset.action === 'rename') renameFile(target);
-  if (button.dataset.action === 'delete') deleteFile(target);
+  const item = event.target.closest('.file-item');
+  if (item) {
+    const fileId = item.dataset.fileId;
+    const match = fileModel.find((entry) => entry.id === fileId);
+    if (match) {
+      activeFileId = fileId;
+      setActiveTab(match.kind);
+      renderFileList();
+    }
+  }
 });
 
 const splitter = document.getElementById('splitter');
